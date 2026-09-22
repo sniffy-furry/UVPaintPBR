@@ -13,6 +13,7 @@ import android.view.Gravity
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.Toast
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -118,6 +119,7 @@ class MainActivity : AppCompatActivity() {
                 glView.submitMesh(mesh)
                 runOnUiThread { Toast.makeText(this, "Loaded ${File(path).name}", Toast.LENGTH_SHORT).show() }
             } catch (e: Exception) {
+                Log.e("uvpaint", "import failed for $path", e)
                 runOnUiThread { Toast.makeText(this, "Import failed: ${e.message}", Toast.LENGTH_LONG).show() }
             }
         }

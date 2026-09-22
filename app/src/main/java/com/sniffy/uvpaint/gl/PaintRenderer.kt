@@ -3,6 +3,7 @@ package com.sniffy.uvpaint.gl
 import android.opengl.GLES30
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
+import android.util.Log
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -42,6 +43,8 @@ void main() {
     fragColor = vec4(base * ndotl, 1.0);
 }
 """
+
+private const val LOG_TAG = "uvpaint-gl"
 
 /**
  * Draws the currently loaded mesh with a UV-checker shader, which doubles as
@@ -88,7 +91,19 @@ class PaintRenderer : GLSurfaceView.Renderer {
     }
 
     override fun onDrawFrame(gl: GL10?) {
-        pendingMesh?.let { upload(it); pendingMesh = null }
+        pendingMesh?.let {
+            // GLSurfaceView's render thread does not catch exceptions thrown
+            // from here — an uncaught one takes the whole app down. Catching
+            // it here turns a hard crash into a log line + a blank/unchanged
+            // viewport, so a bad mesh degrades instead of killing the app.
+            try {
+                upload(it)
+            } catch (e: Throwable) {
+                Log.e(LOG_TAG, "mesh upload failed", e)
+                indexCount = 0
+            }
+            pendingMesh = null
+        }
 
         GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT)
         if (indexCount == 0) return
