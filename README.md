@@ -7,11 +7,16 @@ Pick a model (Import Model button) — it's loaded via assimp (native, JNI),
 centered/normalized, and rendered with a UV checker + basic lighting shader,
 which doubles as a correctness check for both mesh and UV import.
 
-**Known limitation:** only the single picked file is copied in — companion
-files aren't resolved yet. `.glb`, `.fbx`, and `.obj` without materials work
-fully; multi-file `.gltf` (separate `.bin`/textures) needs folder import,
-which is a later step. Materials/textures aren't parsed at all yet — this
-stage is geometry + UVs only.
+Import uses a custom in-app file browser (`FilePickerActivity`) instead of
+the system SAF document picker, backed by direct filesystem access
+(`MANAGE_EXTERNAL_STORAGE` on Android 11+, the classic `READ_EXTERNAL_STORAGE`
+runtime permission below that). The picker returns the model's real path on
+disk rather than a single opaque `content://` Uri, so assimp — which resolves
+references relative to the file it's given — can find sibling files on its
+own. `.glb`, `.fbx`, `.obj`, and multi-file `.gltf` (separate `.bin`/textures
+sitting next to the `.gltf`) all work as long as they live in the same
+folder. Materials/textures aren't parsed at all yet — this stage is geometry
++ UVs only.
 
 ## Roadmap
 1. ~~Scaffold~~ — Gradle + CMake + CI producing an installable APK.
