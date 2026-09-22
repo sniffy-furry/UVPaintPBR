@@ -36,6 +36,7 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
             app/.cxx
+            ~/.android/debug.keystore
           key: ${{ runner.os }}-gradle-cxx-${{ hashFiles('**/*.gradle*', 'app/src/main/cpp/CMakeLists.txt') }}
           restore-keys: |
             ${{ runner.os }}-gradle-cxx-
